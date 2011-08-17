@@ -18,5 +18,5 @@ Gem::Specification.new do |s|
     'bin/*',
     'lib/**/*.rb',
   ].to_a
-  s.executables = ['my_stuff-multidb-unmanagle']
+  s.executables = ['my_stuff-multidb-unmangle']
 end
