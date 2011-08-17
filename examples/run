@@ -28,7 +28,7 @@ module SpecSource
     }
   end
 
-  def spec_for_master id
+  def spec_for_master shard_id
     spec_for_new
   end
 
