@@ -76,7 +76,7 @@ module MyStuff
     def self.unmangle name
       db = name.sub /^:?MYSTUFF_MULTIDB_DB_/, ''
       # Format: "MYSTUFF_MULTIDB_DB_" + hex("host,port,database")
-      host, port, database = db.each_char.each_slice(2).reduce(String.new){ |m,*nibbles| m += "%c" % nibbles.join.hex }.split('!')
+      junk, host, port, database = db.each_char.each_slice(2).reduce(String.new){ |m,*nibbles| m += "%c" % nibbles.join.hex }.split('!')
       {
         :host     => host,
         :port     => port.to_i,

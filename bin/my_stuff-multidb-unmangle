@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+# Copyright 2011-present Fred Emmott. See COPYING file.
+
+_FILE = File.readlink(__FILE__) rescue __FILE__
+_DIR = File.expand_path(File.dirname(_FILE))
+$LOAD_PATH.push(File.expand_path(_DIR +  '/../lib'))
+
+require 'my_stuff/multidb'
+
+def filter line
+  line.gsub(/MYSTUFF_MULTIDB_DB_[a-z0-9]+/){ |mangled|
+    data = MyStuff::MultiDB.unmangle(mangled)
+    "<%s:%d/%s>" % [
+      data[:host],
+      data[:port],
+      data[:database],
+    ]
+  }
+end
+
+if ARGV.empty?
+  STDIN.each_line do |line|
+    puts filter(line.strip)
+  end
+else
+    puts filter(ARGV.first)
+end

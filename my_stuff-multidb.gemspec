@@ -15,6 +15,8 @@ Gem::Specification.new do |s|
   s.files         = FileList[
     'COPYING',
     'README.rdoc',
+    'bin/*',
     'lib/**/*.rb',
   ].to_a
+  s.executables = ['my_stuff-multidb-unmanagle']
 end

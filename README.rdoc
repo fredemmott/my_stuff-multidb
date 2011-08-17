@@ -43,6 +43,23 @@ For more, see:
 * ./examples/run
 * comments at top of lib/mystuff/multidb.rb
 
+= How It Works
+
+For every spec, it defines a new sub-module of MyStuff::MultiDB, which
+encodes the database details, and creates new subclasses of your
+ActiveRecord::Base classes, within these modules. For example:
+
+ $ bin/my_stuff-multidb-unmangle MyStuff::MultiDB::MYSTUFF_MULTIDB_DB_216c6f63616c686f7374213333303621::MyDB::Widget
+ MyStuff::MultiDB::<localhost:3306/>::MyDB::Widget
+ $
+
+There's also lots of deep voodoo making the ActiveRecord stack use the right
+connection details :)
+
+= Caveats
+
+You can not do cross-shard operations simply, eg joins.
+
 = Copying
 
 See the COPYING file.
