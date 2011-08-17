@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.homepage      = 'https://github.com/fredemmott/my_stuff-multidb'
   s.summary       = ''
   s.description   = ''
+  s.license       = 'ISC'
   s.files         = FileList[
     'lib/**/*.rb',
   ].to_a

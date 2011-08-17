@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Copyright 2011-present Fred Emmott. All Rights Reserved.
+# Copyright 2011-present Fred Emmott. See COPYING file.
 
 _FILE = File.readlink(__FILE__) rescue __FILE__
 _DIR = File.expand_path(File.dirname(_FILE))
