@@ -9,10 +9,12 @@ Gem::Specification.new do |s|
   s.email         = ['mail@fredemmott.co.uk']
   s.require_paths = ['lib']
   s.homepage      = 'https://github.com/fredemmott/my_stuff-multidb'
-  s.summary       = ''
+  s.summary       = 'ActiveRecord sharding/slaves library'
   s.description   = ''
   s.license       = 'ISC'
   s.files         = FileList[
+    'COPYING',
+    'README.rdoc',
     'lib/**/*.rb',
   ].to_a
 end
