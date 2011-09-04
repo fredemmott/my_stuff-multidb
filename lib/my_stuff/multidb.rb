@@ -157,6 +157,14 @@ module MyStuff
       return db_mod
     end
 
+    def self.with_spec db, spec # :nodoc:
+      klass = db.for_spec(spec)
+
+      klass.magic_database.connection_pool.with_connection do
+        yield klass, spec
+      end
+    end
+
     protected
     def self.with_db db, id, writable # :nodoc:
       if writable == :writable
@@ -168,10 +176,9 @@ module MyStuff
       elsif writable == :read_only
         spec = db.spec_for_slave(id)
       end
-      klass = db.for_spec(spec)
 
-      klass.magic_database.connection_pool.with_connection do
-        yield klass, spec
+      with_spec(db, spec) do |*args|
+        yield *args
       end
     end
   end
