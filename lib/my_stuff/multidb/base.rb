@@ -24,6 +24,11 @@ module MyStuff
           magic_database.connection
         end
 
+        def connection_pool
+          l self.class.name
+          magic_database.connection_pool
+        end
+
         def abstract_class?; true; end
 
         def model_name
