@@ -87,9 +87,6 @@ module MyStuff
 
     def self.included othermod # :nodoc:
       class <<othermod
-        def for_spec spec
-          MyStuff::MultiDB.for_spec(spec, self)
-        end
         def with_slave *args; raise NotImplementedError.new "Available in MyStuff::MultiDB::Unsharded"; end
         def with_master *args; raise NotImplementedError.new "Available in MyStuff::MultiDB::Unsharded"; end
         def with_master_for *args; raise NotImplementedError.new "Available in MyStuff::MultiDB::Sharded"; end
@@ -102,9 +99,9 @@ module MyStuff
     # Fetch/create the magic classes.
     def self.for_spec spec, mod # :nodoc:
       db_key = ("MYSTUFF_MULTIDB_DB_" + ("!%s!%s!%s" % [
-          spec[:host],
-          spec[:port],
-          spec[:database],
+          spec[:host] || spec['host'],
+          spec[:port] || spec['port'],
+          spec[:database] || spec['database'],
         ]
       ).each_byte.map{ |x| "%x" % x }.join).to_sym
 
