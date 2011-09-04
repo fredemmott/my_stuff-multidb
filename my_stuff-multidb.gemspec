@@ -3,7 +3,7 @@ require 'rake'
 
 Gem::Specification.new do |s|
   s.name          = 'my_stuff-multidb'
-  s.version       = '0.0.2'
+  s.version       = '0.0.3'
   s.platform      = Gem::Platform::RUBY
   s.authors       = ['Fred Emmott']
   s.email         = ['mail@fredemmott.co.uk']
@@ -21,5 +21,5 @@ Gem::Specification.new do |s|
   s.executables = ['my_stuff-multidb-unmangle']
 
   s.add_dependency 'my_stuff-logger', '~> 0.0.3'
-  s.add_dependency 'activerecord', '~> 3.0.7'
+  s.add_dependency 'activerecord'
 end

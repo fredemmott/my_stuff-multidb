@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    my_stuff-multidb (0.0.2)
-      activerecord (~> 3.0.7)
+    my_stuff-multidb (0.0.3)
+      activerecord
       my_stuff-logger (~> 0.0.3)
 
 GEM
