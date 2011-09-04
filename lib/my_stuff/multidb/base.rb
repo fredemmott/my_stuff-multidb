@@ -12,6 +12,10 @@ module MyStuff
       end
      
       module ClassMethods
+        def base_class
+          self
+        end
+
         def magic_database
           @magic_database ||= self.name.split('::').tap(&:pop).join('::').constantize.magic_database
         end
@@ -25,7 +29,6 @@ module MyStuff
         end
 
         def connection_pool
-          l self.class.name
           magic_database.connection_pool
         end
 
@@ -40,6 +43,7 @@ module MyStuff
 
         def inherited(child)
           def child.abstract_class?; false; end
+          def child.base_class; self; end
           super
         end
       end
