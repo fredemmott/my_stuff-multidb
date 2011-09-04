@@ -1,6 +1,7 @@
 # Copyright 2011-present Fred Emmott. See COPYING file.
 
 require 'base64'
+require 'my_stuff/logger'
 
 module MyStuff
   # =Example
@@ -111,6 +112,7 @@ module MyStuff
       if self.const_defined? db_key
         db = self.const_get(db_key)
       else
+        l 'connecting to database: ', spec
         db = Class.new ActiveRecord::Base
         def db.abstract_class?; true; end
         self.const_set(db_key, db)
