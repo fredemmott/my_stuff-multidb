@@ -2,5 +2,6 @@
 .rvmrc
 *.swp
 *.swo
+coverage/
 *~
 Gemfile.lock

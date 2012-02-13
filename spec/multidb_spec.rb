@@ -1,11 +1,9 @@
+require 'spec_helper'
 
 require 'my_stuff/multidb'
 
 require 'fileutils'
 require 'tmpdir'
-
-require 'rubygems'
-require 'sqlite3'
 
 module MySpecDB
   class Widget < ActiveRecord::Base
@@ -26,13 +24,7 @@ describe MyStuff::MultiDB do
         :adapter => 'sqlite3',
         :database => @files[i],
       }
-
-      SQLite3::Database.new(@files[i]).execute <<-SQL
-        create table widgets(
-          id integer primary key,
-          name varchar(30)
-        );
-SQL
+      create_widgets_db @files[i]
     end
   end
 

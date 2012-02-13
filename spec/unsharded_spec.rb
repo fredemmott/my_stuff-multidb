@@ -1,11 +1,9 @@
+require 'spec_helper'
 
 require 'my_stuff/multidb/unsharded'
 
 require 'fileutils'
 require 'tmpdir'
-
-require 'rubygems'
-require 'sqlite3'
 
 module UnshardedDB
   class Widget < ActiveRecord::Base
@@ -45,12 +43,7 @@ end
 describe MyStuff::MultiDB::Unsharded do
   before :all do
     UnshardedDB.db_path = Dir.mktmpdir
-    SQLite3::Database.new(UnshardedDB.db_file).execute <<-SQL
-      create table widgets(
-        id integer primary key,
-        name varchar(30)
-      );
-SQL
+    create_widgets_db(UnshardedDB.db_file)
   end
 
   after :all do
