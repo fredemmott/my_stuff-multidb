@@ -118,14 +118,24 @@ module MyStuff
       end
 
       mod_key = mod.name.split(':').last.to_sym
-      # db_mod: class representing the module from the AR definition
-      if db.const_defined? mod_key, false
-        db_mod = db.const_get(mod_key, false)
+      # db_mod: a copy of the module that's keyed to a specific database
+
+      # 1.8.7 vs 1.9 compatibility...
+      old_const_defined = db.method(:const_defined?).arity == 1
+      new_const_defined = !old_const_defined
+      if (
+        (old_const_defined && db.const_defined?(mod_key)) ||
+        (new_const_defined && db.const_defined?(mod_key, false))
+      )
+        db_mod = db.const_get(mod_key)
       else
         db_mod = Module.new
         db.const_set(mod_key, db_mod)
-        db_mod.send(:define_singleton_method, :magic_database) { db }
-        db_mod.send(:define_singleton_method, :muggle) { mod }
+
+        # Not using define_singleton_method, as that's not in 1.8.7
+        db_mod_singleton  = class <<db_mod; self; end
+        db_mod_singleton.send(:define_method, :magic_database) { db }
+        db_mod_singleton.send(:define_method, :muggle) { mod }
 
         # klass: a specific table's AR class
         def db_mod.const_missing name
@@ -135,7 +145,9 @@ module MyStuff
           # subklass: klass tied to a specific DB
           subklass = Class.new(klass)
           const_set klass_sym, subklass
-          define_singleton_method(klass_sym) { subklass }
+
+          singleton = class <<self; self; end
+          singleton.send(:define_method, klass_sym) { subklass }
 
           subklass.send :include, MyStuff::MultiDB::Base
 
@@ -164,7 +176,7 @@ module MyStuff
     end
 
     protected
-    def self.with_db db, id, writable # :nodoc:
+    def self.with_db db, id, writable, &block # :nodoc:
       if writable == :writable
         if id == :new
           spec = db.spec_for_new
@@ -175,8 +187,12 @@ module MyStuff
         spec = db.spec_for_slave(id)
       end
 
-      with_spec(db, spec) do |*args|
-        yield *args
+      with_spec(db, spec) do |db_mod, spec|
+        if block.arity == 1
+          block.call db_mod
+        else
+          block.call db_mod, spec
+        end
       end
     end
   end

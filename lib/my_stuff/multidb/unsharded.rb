@@ -14,15 +14,15 @@ module MyStuff
         othermod.send :include, MyStuff::MultiDB
         class <<othermod
           def sharded?; false; end;
-          def with_master
+          def with_master &block
             MyStuff::MultiDB.with_db(
-              self, :unsharded, :writable
-            ) { |*args| yield *args }
+              self, :unsharded, :writable, &block
+            )
           end
-          def with_slave
+          def with_slave &block
             MyStuff::MultiDB.with_db(
-              self, :unsharded, :read_only
-            ) { |*args| yield *args}
+              self, :unsharded, :read_only, &block
+            )
           end
         end
       end
