@@ -19,17 +19,17 @@ module UnshardedDB
       db_path + '/test.sqlite'
     end
 
-    def spec_for_master shard_id
+    def spec_for_master
       counters[:master] += 1
-      self.my_spec_for(shard_id)
+      self.my_spec
     end
 
-    def spec_for_slave shard_id
+    def spec_for_slave
       counters[:slave] += 1
-      self.my_spec_for(shard_id)
+      self.my_spec
     end
 
-    def my_spec_for shard_id
+    def my_spec
       {
         :adapter => 'sqlite3',
         :database => db_file

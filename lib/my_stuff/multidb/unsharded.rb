@@ -15,13 +15,17 @@ module MyStuff
         class <<othermod
           def sharded?; false; end;
           def with_master &block
-            MyStuff::MultiDB.with_db(
-              self, :unsharded, :writable, &block
+            MyStuff::MultiDB.with_spec(
+              self,
+              self.spec_for_master,
+              &block
             )
           end
           def with_slave &block
-            MyStuff::MultiDB.with_db(
-              self, :unsharded, :read_only, &block
+            MyStuff::MultiDB.with_spec(
+              self,
+              self.spec_for_slave,
+              &block
             )
           end
         end
