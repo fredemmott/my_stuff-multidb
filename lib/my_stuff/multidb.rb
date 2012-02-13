@@ -2,6 +2,9 @@
 
 require 'base64'
 
+require 'rubygems'
+require 'active_record'
+
 module MyStuff
   # =Example
   #
