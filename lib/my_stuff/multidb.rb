@@ -170,11 +170,15 @@ module MyStuff
       return db_mod
     end
 
-    def self.with_spec db, spec # :nodoc:
+    def self.with_spec db, spec, &block # :nodoc:
       klass = MyStuff::MultiDB.for_spec(spec, db)
 
       klass.magic_database.connection_pool.with_connection do
-        yield klass, spec
+        if block.arity == 1
+          block.call klass
+        else
+          block.call klass, spec
+        end
       end
     end
 
@@ -190,13 +194,7 @@ module MyStuff
         spec = db.spec_for_slave(id)
       end
 
-      with_spec(db, spec) do |db_mod, spec|
-        if block.arity == 1
-          block.call db_mod
-        else
-          block.call db_mod, spec
-        end
-      end
+      with_spec(db, spec, &block)
     end
   end
 end
