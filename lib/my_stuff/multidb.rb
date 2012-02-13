@@ -80,38 +80,42 @@ module MyStuff
       end
     end
 
+    def self.ar_base_class_for_spec spec
+      name = MyStuff::MultiDB::Mangling.mangle(spec).to_sym
+
+      if self.const_defined?(name)
+        return self.const_get(name)
+      end
+
+      ar_base = Class.new(ActiveRecord::Base)
+      def ar_base.abstract_class?; true; end
+      self.const_set(name, ar_base)
+      ar_base.establish_connection(spec)
+      return ar_base
+    end
+
     # Fetch/create the magic classes.
     def self.for_spec spec, mod # :nodoc:
-      db_key = MyStuff::MultiDB::Mangling.mangle(spec)
-
-      # db: class representing the logical database
-      if self.const_defined? db_key
-        db = self.const_get(db_key)
-      else
-        db = Class.new ActiveRecord::Base
-        def db.abstract_class?; true; end
-        self.const_set(db_key, db)
-        db.establish_connection(spec)
-      end
+      ar_base = ar_base_class_for_spec(spec)
 
       mod_key = mod.name.split(':').last.to_sym
       # db_mod: a copy of the module that's keyed to a specific database
 
       # 1.8.7 vs 1.9 compatibility...
-      old_const_defined = db.method(:const_defined?).arity == 1
+      old_const_defined = ar_base.method(:const_defined?).arity == 1
       new_const_defined = !old_const_defined
       if (
-        (old_const_defined && db.const_defined?(mod_key)) ||
-        (new_const_defined && db.const_defined?(mod_key, false))
+        (old_const_defined && ar_base.const_defined?(mod_key)) ||
+        (new_const_defined && ar_base.const_defined?(mod_key, false))
       )
-        db_mod = db.const_get(mod_key)
+        db_mod = ar_base.const_get(mod_key)
       else
         db_mod = Module.new
-        db.const_set(mod_key, db_mod)
+        ar_base.const_set(mod_key, db_mod)
 
         # Not using define_singleton_method, as that's not in 1.8.7
         db_mod_singleton  = class <<db_mod; self; end
-        db_mod_singleton.send(:define_method, :magic_database) { db }
+        db_mod_singleton.send(:define_method, :magic_database) { ar_base }
         db_mod_singleton.send(:define_method, :muggle) { mod }
 
         # klass: a specific table's AR class
