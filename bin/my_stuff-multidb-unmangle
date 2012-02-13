@@ -5,11 +5,11 @@ _FILE = File.readlink(__FILE__) rescue __FILE__
 _DIR = File.expand_path(File.dirname(_FILE))
 $LOAD_PATH.push(File.expand_path(_DIR +  '/../lib'))
 
-require 'my_stuff/multidb'
+require 'my_stuff/multidb/mangling'
 
 def filter line
   line.gsub(/MYSTUFF_MULTIDB_DB_[a-z0-9]+/){ |mangled|
-    data = MyStuff::MultiDB.unmangle(mangled)
+    data = MyStuff::MultiDB::Mangling.unmangle(mangled)
     "<%s:%d/%s>" % [
       data[:host],
       data[:port],
