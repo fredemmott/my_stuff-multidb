@@ -1,5 +1,6 @@
 # Copyright 2011-present Fred Emmott. See COPYING file.
 
+require 'my_stuff/multidb/mangling'
 require 'my_stuff/multidb/core_ext/base'
 
 require 'base64'
@@ -61,7 +62,7 @@ module MyStuff
   module MultiDB
     def self.open_connections
       Hash.new.tap do |result|
-        constants.each do |name|
+        self.constants.each do |name|
           if name.to_s.starts_with? 'MYSTUFF_MULTIDB_DB'
             klass = const_get(name, false)
             checked_out = klass.connection_pool.instance_eval { @checked_out.size }
@@ -69,24 +70,6 @@ module MyStuff
           end
         end
       end
-    end
-
-    # Takes a module name and converts it to connection details.
-    #
-    # Example:
-    # mangled::    <tt>MyStuff::MultiDB::MYSTUFF_MULTIDB_DB_747970686f6e2e66726564656d6d6f74742e636f2e756b2c333330362c747474::ServiceLocator::Tier</tt>
-    # unmanagled:: <tt>MyStuff::MultiDB::<mysql://typhon.fredemmott.co.uk:3306/ttt>::ServiceLocator::Tier</tt>
-    #
-    # The initscript cat-log and tail-log commands will do this unmanggling for you.
-    def self.unmangle name
-      db = name.sub /^:?MYSTUFF_MULTIDB_DB_/, ''
-      # Format: "MYSTUFF_MULTIDB_DB_" + hex("host,port,database")
-      junk, host, port, database = db.each_char.each_slice(2).reduce(String.new){ |m,*nibbles| m += "%c" % nibbles.join.hex }.split('!')
-      {
-        :host     => host,
-        :port     => port.to_i,
-        :database => database,
-      }
     end
 
     def self.included othermod # :nodoc:
@@ -99,12 +82,7 @@ module MyStuff
 
     # Fetch/create the magic classes.
     def self.for_spec spec, mod # :nodoc:
-      db_key = ("MYSTUFF_MULTIDB_DB_" + ("!%s!%s!%s" % [
-          spec[:host] || spec['host'],
-          spec[:port] || spec['port'],
-          spec[:database] || spec['database'],
-        ]
-      ).each_byte.map{ |x| "%x" % x }.join).to_sym
+      db_key = MyStuff::MultiDB::Mangling.mangle(spec)
 
       # db: class representing the logical database
       if self.const_defined? db_key
