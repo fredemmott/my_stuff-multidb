@@ -1,5 +1,7 @@
 # Copyright 2011-present Fred Emmott. See COPYING file.
 
+require 'my_stuff/multidb/core_ext/base'
+
 require 'base64'
 
 require 'rubygems'
@@ -146,7 +148,7 @@ module MyStuff
           singleton = class <<self; self; end
           singleton.send(:define_method, klass_sym) { subklass }
 
-          subklass.send :include, MyStuff::MultiDB::Base
+          subklass.send :include, MyStuff::MultiDB::CoreExt::Base
 
           # Make associations work.
           klass.reflect_on_all_associations.each do |reflection|
@@ -178,6 +180,5 @@ module MyStuff
   end
 end
 
-require 'my_stuff/multidb/base'
 require 'my_stuff/multidb/sharded'
 require 'my_stuff/multidb/unsharded'
