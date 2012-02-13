@@ -1,7 +1,6 @@
 # Copyright 2011-present Fred Emmott. See COPYING file.
 
 require 'base64'
-require 'my_stuff/logger'
 
 module MyStuff
   # =Example

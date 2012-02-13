@@ -20,6 +20,5 @@ Gem::Specification.new do |s|
   ].to_a
   s.executables = ['my_stuff-multidb-unmangle']
 
-  s.add_dependency 'my_stuff-logger', '~> 0.0.3'
-  s.add_dependency 'activerecord'
+  s.add_dependency 'activerecord', '~> 3.2', '>= 3.2.1'
 end
