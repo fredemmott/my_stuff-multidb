@@ -17,7 +17,7 @@ module MyStuff
           end
           def with_master_for_new
             MyStuff::MultiDB.with_db(
-              self, :new, :read_only
+              self, :new, :writable
             ) { |*args| yield *args}
           end
           def with_slave_for id
