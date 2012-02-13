@@ -108,7 +108,6 @@ module MyStuff
       if self.const_defined? db_key
         db = self.const_get(db_key)
       else
-        l 'connecting to database: ', spec
         db = Class.new ActiveRecord::Base
         def db.abstract_class?; true; end
         self.const_set(db_key, db)
@@ -154,7 +153,7 @@ module MyStuff
     end
 
     def self.with_spec db, spec # :nodoc:
-      klass = db.for_spec(spec)
+      klass = MyStuff::MultiDB.for_spec(spec, db)
 
       klass.magic_database.connection_pool.with_connection do
         yield klass, spec

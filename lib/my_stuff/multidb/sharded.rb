@@ -1,10 +1,13 @@
 # Copyright 2011-present Fred Emmott. See COPYING file.
 
+require 'my_stuff/multidb'
+
 module MyStuff
   module MultiDB
     module Sharded
       def self.included othermod # :nodoc:
         othermod.send :include, MyStuff::MultiDB
+
         class <<othermod
           def sharded?; true; end;
           def with_master_for id

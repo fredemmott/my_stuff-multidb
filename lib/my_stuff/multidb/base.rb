@@ -16,16 +16,6 @@ module MyStuff
           self
         end
 
-        def with_spec spec
-          MyStuff::MultiDB.with_spec(
-            self, spec
-          ) { |*args| yield *args }
-        end
-
-        def for_spec spec
-          MyStuff::MultiDB.for_spec(spec, self)
-        end
-
         def magic_database
           @magic_database ||= self.name.split('::').tap(&:pop).join('::').constantize.magic_database
         end

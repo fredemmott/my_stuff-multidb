@@ -1,4 +1,6 @@
 # Copyright 2011-present Fred Emmott. See COPYING file.
+#
+require 'my_stuff/multidb'
 
 module MyStuff
   module MultiDB

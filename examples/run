@@ -41,8 +41,8 @@ module MyDB
   class Widget < ActiveRecord::Base
   end
 
-  extend ::SpecSource
   include MyStuff::MultiDB::Sharded # OK, only one shard. Meh, I lied.
+  extend ::SpecSource
 end
 
 
