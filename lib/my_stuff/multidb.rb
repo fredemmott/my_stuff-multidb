@@ -94,6 +94,9 @@ module MyStuff
         def with_master_for *args; raise NotImplementedError.new "Available in MyStuff::MultiDB::Sharded"; end
         def with_master_for_new; raise NotImplementedError.new "Available in MyStuff::MultiDB::Sharded"; end
         def with_slave_for *args; raise NotImplementedError.new "Available in MyStuff::MultiDB::Sharded"; end
+        def with_spec spec, &block
+          MyStuff::MultiDB.with_spec(self, spec, &block)
+        end
         def sharded?; raise NotImplementedError.new; end
       end
     end
