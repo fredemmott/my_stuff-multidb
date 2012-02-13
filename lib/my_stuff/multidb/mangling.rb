@@ -21,6 +21,9 @@ module MyStuff
         }
       end
 
+      # Create a valid constant name from an ActiveRecord spec.
+      #
+      # This can be revered by {#unmangle}.
       def self.mangle spec
         'MYSTUFF_MULTIDB_DB_' + (
           "%s!%s!%s" % [
