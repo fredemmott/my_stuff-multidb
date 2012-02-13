@@ -181,21 +181,6 @@ module MyStuff
         end
       end
     end
-
-    protected
-    def self.with_db db, id, writable, &block # :nodoc:
-      if writable == :writable
-        if id == :new
-          spec = db.spec_for_new
-        else
-          spec = db.spec_for_master(id)
-        end
-      elsif writable == :read_only
-        spec = db.spec_for_slave(id)
-      end
-
-      with_spec(db, spec, &block)
-    end
   end
 end
 
