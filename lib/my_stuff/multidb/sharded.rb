@@ -9,8 +9,6 @@ module MyStuff
         othermod.send :include, MyStuff::MultiDB
 
         class <<othermod
-          def sharded?; true; end;
-
           def with_master_for id, &block
             MyStuff::MultiDB.with_spec(
               self,
@@ -34,6 +32,10 @@ module MyStuff
               &block
             )
           end
+
+          def spec_for_new; raise NotImplementedError.new; end
+          def spec_for_master(shard_id); raise NotImplementedError.new; end
+          def spec_for_slave(shard_id); raise NotImplementedError.new; end
         end
       end
     end

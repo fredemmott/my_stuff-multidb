@@ -9,6 +9,8 @@ module UnshardedDB
   class Widget < ActiveRecord::Base
   end
 
+  include MyStuff::MultiDB::Unsharded
+
   class <<self
     attr_accessor :db_path
     def counters
@@ -36,8 +38,6 @@ module UnshardedDB
       }
     end
   end
-
-  include MyStuff::MultiDB::Unsharded
 end
 
 describe MyStuff::MultiDB::Unsharded do

@@ -12,8 +12,8 @@ module MyStuff
     module Unsharded
       def self.included othermod # :nodoc:
         othermod.send :include, MyStuff::MultiDB
+
         class <<othermod
-          def sharded?; false; end;
           def with_master &block
             MyStuff::MultiDB.with_spec(
               self,
@@ -21,6 +21,7 @@ module MyStuff
               &block
             )
           end
+
           def with_slave &block
             MyStuff::MultiDB.with_spec(
               self,
@@ -28,6 +29,9 @@ module MyStuff
               &block
             )
           end
+
+          def spec_for_master; raise NotImplementedError.new; end
+          def spec_for_slave; raise NotImplementedError.new; end
         end
       end
     end
