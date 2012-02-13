@@ -22,7 +22,8 @@ module MyStuff
           end
 
           def magic_database
-            @magic_database ||= self.name.split('::').tap(&:pop).join('::').constantize.magic_database
+            @magic_database ||=
+              self.name.split('::')[0..-2].join('::').constantize
           end
 
           def arel_engine

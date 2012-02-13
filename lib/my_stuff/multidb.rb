@@ -1,6 +1,6 @@
 # Copyright 2011-present Fred Emmott. See COPYING file.
 
-require 'my_stuff/multidb/mangling'
+require 'my_stuff/multidb/connection'
 require 'my_stuff/multidb/core_ext/base'
 
 require 'base64'
@@ -60,18 +60,6 @@ module MyStuff
   # So, you end up with an ActiveRecord class like:
   # MyStuff::MultiDB::MANGLED_DATABASE_NAME::YourModule::YourClass
   module MultiDB
-    def self.open_connections
-      Hash.new.tap do |result|
-        self.constants.each do |name|
-          if name.to_s.starts_with? 'MYSTUFF_MULTIDB_DB'
-            klass = const_get(name, false)
-            checked_out = klass.connection_pool.instance_eval { @checked_out.size }
-            result[name] = checked_out if checked_out > 0
-          end
-        end
-      end
-    end
-
     def self.included othermod # :nodoc:
       class <<othermod
         def with_spec spec, &block
@@ -80,82 +68,15 @@ module MyStuff
       end
     end
 
-    def self.ar_base_class_for_spec spec
-      name = MyStuff::MultiDB::Mangling.mangle(spec).to_sym
+    def self.with_spec original_module, spec, &block # :nodoc:
+      ar_base = Connection.base_class_for_spec(spec)
+      rebased_module = ar_base.rebased_module(original_module)
 
-      if self.const_defined?(name)
-        return self.const_get(name)
-      end
-
-      ar_base = Class.new(ActiveRecord::Base)
-      def ar_base.abstract_class?; true; end
-      self.const_set(name, ar_base)
-      ar_base.establish_connection(spec)
-      return ar_base
-    end
-
-    # Fetch/create the magic classes.
-    def self.for_spec spec, mod # :nodoc:
-      ar_base = ar_base_class_for_spec(spec)
-
-      mod_key = mod.name.split(':').last.to_sym
-      # db_mod: a copy of the module that's keyed to a specific database
-
-      # 1.8.7 vs 1.9 compatibility...
-      old_const_defined = ar_base.method(:const_defined?).arity == 1
-      new_const_defined = !old_const_defined
-      if (
-        (old_const_defined && ar_base.const_defined?(mod_key)) ||
-        (new_const_defined && ar_base.const_defined?(mod_key, false))
-      )
-        db_mod = ar_base.const_get(mod_key)
-      else
-        db_mod = Module.new
-        ar_base.const_set(mod_key, db_mod)
-
-        # Not using define_singleton_method, as that's not in 1.8.7
-        db_mod_singleton  = class <<db_mod; self; end
-        db_mod_singleton.send(:define_method, :magic_database) { ar_base }
-        db_mod_singleton.send(:define_method, :muggle) { mod }
-
-        # klass: a specific table's AR class
-        def db_mod.const_missing name
-          klass = muggle.const_get(name)
-          klass_sym = klass.name.split(':').last.to_sym
-
-          # subklass: klass tied to a specific DB
-          subklass = Class.new(klass)
-          const_set klass_sym, subklass
-
-          singleton = class <<self; self; end
-          singleton.send(:define_method, klass_sym) { subklass }
-
-          subklass.send :include, MyStuff::MultiDB::CoreExt::Base
-
-          # Make associations work.
-          klass.reflect_on_all_associations.each do |reflection|
-            subklass.send(
-              reflection.macro, # eg :has_one
-              reflection.name, # eg :some_table
-              reflection.options
-            )
-          end
-
-          return subklass
-        end
-      end
-
-      return db_mod
-    end
-
-    def self.with_spec db, spec, &block # :nodoc:
-      klass = MyStuff::MultiDB.for_spec(spec, db)
-
-      klass.magic_database.connection_pool.with_connection do
+      ar_base.connection_pool.with_connection do
         if block.arity == 1
-          block.call klass
+          block.call rebased_module
         else
-          block.call klass, spec
+          block.call rebased_module, spec
         end
       end
     end
