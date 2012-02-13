@@ -3,7 +3,7 @@
 Overview
 ========
 
-This provides an API that's relatively convenient for:
+This provides an API to easily use ActiveRecord with multiple connections - for example:
 
 * Reading from slaves
 * Using multiple shards
@@ -12,43 +12,17 @@ Usage
 =====
 
 ````ruby
-module MySpecProvider
-  def spec_for_new
-    { :adapter => 'mysql', :host => ...}
-  end
-
-  def spec_for_master shard_id
-    ...
-  end
-
-  def spec_for_slave shard_id
-    ...
-  end
-end
 
 module MyDB
   class Widget < ActiveRecord::Base; end
-  include MyStuff::MultiDB::Sharded
-  extend MySpecProvider
+  include MyStuff::MultiDB
 end
 
-MyDB.with_master_for_new do |db,spec|
+MyDB.with_spec(:adapter => 'sqlite3', :database => ':memory:') do |db,spec|
   db::Widget.create(...)
-end
-
-MyDB.with_slave_for(shard_id) do |db|
-  db::Widget.find(record_id);
-  ...
 end
 ````
 
-Another option, if you only do primary key lookups, is to encode the shard
-ID into the record id.
-
-For more, see:
-
-* ./examples/run
-* comments at top of lib/mystuff/multidb.rb
 
 How It Works
 ============
